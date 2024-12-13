@@ -18,7 +18,7 @@ DB_PASS = os.environ.get('DB_PASS')
 # Configurações do email
 EMAIL_USER = os.environ.get('EMAIL_USER')
 EMAIL_PASS = os.environ.get('EMAIL_PASS')
-EMAIL_TO = os.environ.get('EMAIL_TO')
+EMAIL_TO = os.environ.get('EMAIL_TO', '').split(';')  # Separa os emails por ponto e vírgula
 
 print("=== Iniciando execução do script ===")
 
@@ -109,11 +109,10 @@ try:
         tamanho = os.path.getsize(caminho_completo)
         print(f"✓ Arquivo criado com sucesso! Tamanho: {tamanho/1024:.2f} KB")
         
-        print("\n5. Enviando email...")
-        # Criar a mensagem
+        print("\n5. Enviando emails...")
+        # Criar a mensagem base
         msg = MIMEMultipart()
         msg['From'] = EMAIL_USER
-        msg['To'] = EMAIL_TO
         msg['Subject'] = f'Relatório Mensal - {data_atual}'
         
         # Corpo do email
@@ -134,17 +133,38 @@ try:
             msg.attach(part)
         
         # Conectar ao servidor SMTP do Outlook
+        print("Conectando ao servidor SMTP...")
         server = smtplib.SMTP('smtp.office365.com', 587)
         server.starttls()
+        
+        print("Realizando login...")
         server.login(EMAIL_USER, EMAIL_PASS)
         
-        # Enviar email
-        server.send_message(msg)
+        # Enviar email para cada destinatário
+        for email in EMAIL_TO:
+            email = email.strip()  # Remove espaços em branco
+            if email:  # Verifica se o email não está vazio
+                try:
+                    print(f"Enviando para {email}...")
+                    msg['To'] = email
+                    server.send_message(msg)
+                    print(f"✓ Email enviado com sucesso para: {email}")
+                except Exception as e:
+                    print(f"✗ Erro ao enviar para {email}: {str(e)}")
+        
         server.quit()
-        print("✓ Email enviado com sucesso!")
+        print("\n✓ Processo de envio de emails concluído!")
+        
+        # Listar arquivos no diretório
+        print("\n6. Arquivos no diretório:")
+        for arquivo in os.listdir():
+            print(f"- {arquivo}")
+    
+    else:
+        print("✗ Erro: Arquivo não foi criado!")
 
 except Exception as e:
     print(f"\n❌ Erro durante a execução: {str(e)}")
     raise
-
-print("\n=== Fim da execução ===")
+finally:
+    print("\n=== Fim da execução ===")
