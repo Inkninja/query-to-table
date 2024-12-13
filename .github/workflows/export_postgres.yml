@@ -1,10 +1,9 @@
-# Arquivo: .github/workflows/export_postgres.yml
 name: Export PostgreSQL to Excel Monthly
 
 on:
   schedule:
-    - cron: '0 0 1 * *'  # Executa às 00:00 do primeiro dia de cada mês
-  workflow_dispatch:  # Permite execução manual também
+    - cron: '0 0 1 * *'
+  workflow_dispatch:
 
 jobs:
   export:
@@ -23,6 +22,15 @@ jobs:
         python -m pip install --upgrade pip
         pip install pandas psycopg2-binary sqlalchemy openpyxl
     
+    - name: Debug environment
+      run: |
+        echo "Checking environment variables (valores ocultos):"
+        echo "DB_HOST está definido: ${{ secrets.DB_HOST != '' }}"
+        echo "DB_PORT está definido: ${{ secrets.DB_PORT != '' }}"
+        echo "DB_NAME está definido: ${{ secrets.DB_NAME != '' }}"
+        echo "DB_USER está definido: ${{ secrets.DB_USER != '' }}"
+        echo "DB_PASS está definido: ${{ secrets.DB_PASS != '' }}"
+    
     - name: Run export script
       env:
         DB_HOST: ${{ secrets.DB_HOST }}
@@ -30,11 +38,6 @@ jobs:
         DB_NAME: ${{ secrets.DB_NAME }}
         DB_USER: ${{ secrets.DB_USER }}
         DB_PASS: ${{ secrets.DB_PASS }}
-      run: python export_script.py
-      
-    - name: Upload Excel as artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: relatorio-mensal
-        path: relatorio_*.xlsx
-        retention-days: 90
+      run: |
+        echo "Iniciando script..."
+        python export_script.py
