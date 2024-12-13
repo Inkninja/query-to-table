@@ -30,12 +30,11 @@ jobs:
         DB_NAME: ${{ secrets.DB_NAME }}
         DB_USER: ${{ secrets.DB_USER }}
         DB_PASS: ${{ secrets.DB_PASS }}
-        
       run: python export_script.py
       
     - name: Upload Excel as artifact
-      uses: actions/upload-artifact@v3  # Atualizado para v3
+      uses: actions/upload-artifact@v3
       with:
         name: relatorio-mensal
         path: relatorio_*.xlsx
-        retention-days: 90  # Mantém os arquivos por 90 dias
+        retention-days: 90
