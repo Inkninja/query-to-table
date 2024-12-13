@@ -29,6 +29,9 @@ jobs:
         DB_NAME: ${{ secrets.DB_NAME }}
         DB_USER: ${{ secrets.DB_USER }}
         DB_PASS: ${{ secrets.DB_PASS }}
+        EMAIL_USER: ${{ secrets.EMAIL_USER }}
+        EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+        EMAIL_TO: ${{ secrets.EMAIL_TO }}
       run: |
         python export_script.py
         echo "Verificando arquivo gerado..."
@@ -41,4 +44,4 @@ jobs:
         name: relatorio-mensal
         path: relatorio_*.xlsx
         retention-days: 90
-        if-no-files-found: error  # Vai falhar se não encontrar o arquivo
+        if-no-files-found: error
