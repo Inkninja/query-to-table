@@ -22,15 +22,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install pandas psycopg2-binary sqlalchemy openpyxl
     
-    - name: Debug environment
-      run: |
-        echo "Checking environment variables (valores ocultos):"
-        echo "DB_HOST está definido: ${{ secrets.DB_HOST != '' }}"
-        echo "DB_PORT está definido: ${{ secrets.DB_PORT != '' }}"
-        echo "DB_NAME está definido: ${{ secrets.DB_NAME != '' }}"
-        echo "DB_USER está definido: ${{ secrets.DB_USER != '' }}"
-        echo "DB_PASS está definido: ${{ secrets.DB_PASS != '' }}"
-    
     - name: Run export script
       env:
         DB_HOST: ${{ secrets.DB_HOST }}
@@ -39,5 +30,15 @@ jobs:
         DB_USER: ${{ secrets.DB_USER }}
         DB_PASS: ${{ secrets.DB_PASS }}
       run: |
-        echo "Iniciando script..."
         python export_script.py
+        echo "Verificando arquivo gerado..."
+        ls -la
+    
+    - name: Upload Excel as artifact
+      if: success()
+      uses: actions/upload-artifact@v3
+      with:
+        name: relatorio-mensal
+        path: relatorio_*.xlsx
+        retention-days: 90
+        if-no-files-found: error  # Vai falhar se não encontrar o arquivo
