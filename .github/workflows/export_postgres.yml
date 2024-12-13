@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: '3.10'
     
@@ -32,7 +32,8 @@ jobs:
       run: python export_script.py
       
     - name: Upload Excel as artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3  # Atualizado para v3
       with:
         name: relatorio-mensal
         path: relatorio_*.xlsx
+        retention-days: 90  # Mantém os arquivos por 90 dias
